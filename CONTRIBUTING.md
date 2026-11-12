@@ -16,7 +16,7 @@ community actually uses a term, please tell us. You do not need to understand
 GitHub, TypeScript, or ontologies to do this.
 
 **[Open an issue using our feedback form](https://github.com/lsc-sde/federated-analytics-ontology/issues/new?template=definition-feedback.yml)**. The form
-asks which term you're commenting on, which audience it affects, what's wrong or
+asks which term and definition level you're commenting on, what's wrong or
 missing, and any wording you'd suggest instead — but **every field except the
 first is optional**. Tell us whatever you can and leave the rest blank.
 
@@ -181,14 +181,22 @@ resolve to real nodes, and tag reasons reference nodes that exist.
 #### The shape of a node
 
 Each entry in `data/ontology.json` is keyed by its `id` and must repeat that
-`id` in the body. All four audiences are required for both `definitions` and
-`examples`:
+`id` in the body. All four legacy audiences are still required for both
+`definitions` and `examples`, but are not displayed in the Atlas. A visible
+Why/What node also needs `shared_definition`, with Summary, Detailed, a shared
+example and a review status:
 
 ```json
 "fed_people": {
   "id": "fed_people",
   "label": "Federation of People",
-  "type": "concept",
+  "type": "definition",
+  "shared_definition": {
+    "summary": "An accessible definition for everyone.",
+    "detailed": "More information about the same concept.",
+    "example": "A shared worked example.",
+    "status": "draft"
+  },
   "definitions": {
     "public": "Plain English, no jargon.",
     "tech": "Technical and architectural detail.",
@@ -198,7 +206,6 @@ Each entry in `data/ontology.json` is keyed by its `id` and must repeat that
   "examples": {
     "public": "…", "tech": "…", "researcher": "…", "gov": "…"
   },
-  "characteristics": ["Observable or measurable statement"],
   "tags": ["Safe People", "PEDRI: Transparency"],
   "children": ["some_other_node_id"]
 }
@@ -206,10 +213,17 @@ Each entry in `data/ontology.json` is keyed by its `id` and must repeat that
 
 #### Adding a new node
 
-A new node is only reachable if an existing node lists it in `children`. Add the
-node, then add its `id` to the `children` array of its parent — otherwise it
-will never appear in the graph view, only in the tabular view. `validate:data`
-reports unreachable nodes on every run; please don't add to that list.
+Add the node and list its `id` in the `children` array of its parent. To display
+it in the Atlas, also add its ID to the appropriate layer in
+`data/atlas-layers.json` and provide `shared_definition`. This shared layer list
+controls both graph and table membership; How/Who concepts remain in the
+ontology without being displayed. `validate:data` checks visible content and
+reports unreachable ontology nodes on every run.
+
+New shared text should start with `status: "draft"`. Set it to `"verified"`
+only after project review, not simply after a successful data-validation run.
+Framework tags, Purpose and Essential Characteristics are retained supporting
+data but are currently hidden while their language and alignment are reviewed.
 
 If you add a framework tag to a node, please also add a corresponding entry in
 `tag-reasons.json` explaining **why** it applies. Unexplained tags are hard for

@@ -29,6 +29,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test": "node --test scripts/atlas.test.mjs",
     "preview": "vite preview",
     "validate:data": "node scripts/validate-data.mjs",
     "extract:data": "node scripts/extract-data.mjs"

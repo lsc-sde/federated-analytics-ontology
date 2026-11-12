@@ -52,6 +52,7 @@ export interface OntologyNode {
     subtitle?: string;
     purpose?: string;
     type: EntityType;
+    shared_definition?: SharedDefinition;
     definitions: {
         public: string;
         tech: string;
@@ -86,6 +87,15 @@ export interface OntologyNode {
     children?: string[];
 }
 
+export type DefinitionLevel = 'summary' | 'detailed';
+
+export interface SharedDefinition {
+    summary: string;
+    detailed: string;
+    example: string;
+    status: 'draft' | 'verified';
+}
+
 // ---------------------------------------------------------------------------
 // Ontology content
 //
@@ -104,5 +114,5 @@ import initialVisibleNodesRaw from '../../data/initial-visible-nodes.json';
 export const ontologyData: Record<string, OntologyNode> =
     ontologyRaw as unknown as Record<string, OntologyNode>;
 
-// Initial nodes that are visible when the app loads
+// Legacy root-node list retained for data consumers; Atlas uses atlas-layers.json.
 export const initialVisibleNodes: string[] = initialVisibleNodesRaw as string[];

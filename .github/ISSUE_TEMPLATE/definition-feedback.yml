@@ -17,7 +17,7 @@ body:
     attributes:
       label: What would you like to tell us?
       description: Describe what's unclear, wrong, missing, or worth changing.
-      placeholder: e.g. "The public definition of 'federated analytics' uses the word 'node', which I had never heard before."
+      placeholder: e.g. "The Summary definition of 'federated analytics' uses the word 'node', which I had never heard before."
     validations:
       required: true
 
@@ -46,18 +46,16 @@ body:
       required: false
 
   - type: dropdown
-    id: audience
+    id: definition-level
     attributes:
-      label: Which perspective does this affect?
+      label: Which definition level does this affect?
       description: >-
-        The site shows four versions of each definition. Choose the one you were
+        The site shows Summary and Detailed definitions for everyone. Choose the one you were
         reading, if you know.
       multiple: true
       options:
-        - Public (why it matters)
-        - Technical (how it works)
-        - Researcher (what I can do)
-        - Governance (who's accountable)
+        - Summary
+        - Detailed
         - Not sure / applies to all
     validations:
       required: false

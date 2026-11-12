@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/lsc-sde/federated-analytics-ontology/data/schema/ontology.schema.json",
   "title": "Federated Analytics Ontology — ontology",
-  "description": "A map of concepts used in federated health data research. Each concept is defined for four audiences and mapped to the Five Safes, FAIR, PEDRI and SATRE frameworks.",
+  "description": "A map of concepts used in federated health data research. Visible Why/What concepts have shared Summary/Detailed definitions. Legacy audience definitions, How/Who concepts and framework mappings are retained.",
   "type": "object",
   "additionalProperties": { "$ref": "#/$defs/ontologyNode" },
   "$defs": {
@@ -42,6 +42,18 @@
         "type": {
           "type": "string",
           "enum": ["definition", "solution", "provider", "framework"]
+        },
+        "shared_definition": {
+          "type": "object",
+          "description": "Shared Atlas content. Verified content was supplied by the project; draft content awaits review.",
+          "properties": {
+            "summary": { "type": "string", "minLength": 1 },
+            "detailed": { "type": "string", "minLength": 1 },
+            "example": { "type": "string", "minLength": 1 },
+            "status": { "type": "string", "enum": ["draft", "verified"] }
+          },
+          "required": ["summary", "detailed", "example", "status"],
+          "additionalProperties": false
         },
         "definitions": { "$ref": "#/$defs/audienceText" },
         "examples": { "$ref": "#/$defs/audienceText" },

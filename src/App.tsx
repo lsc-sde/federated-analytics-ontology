@@ -2,13 +2,14 @@ import { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import GraphViewer from './components/GraphViewer';
 import TabularView from './components/TabularView';
-import { FrameworkTag, OntologyNode } from './data/ontology';
+import { DefinitionLevel } from './data/ontology';
+import { AtlasNode } from './data/atlas';
 import { ReactFlowProvider } from '@xyflow/react';
 
 function App() {
-  const [perspective, setPerspective] = useState<'public' | 'tech' | 'researcher' | 'gov'>('public');
-  const [activeFilter, setActiveFilter] = useState<FrameworkTag | null>(null);
-  const [selectedNode, setSelectedNode] = useState<OntologyNode | null>(null);
+  const [definitionLevel, setDefinitionLevel] = useState<DefinitionLevel>('summary');
+  const [selectedNode, setSelectedNode] = useState<AtlasNode | null>(null);
+  const [resetKey, setResetKey] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentView, setCurrentView] = useState<'graph' | 'table'>('graph');
 
@@ -16,16 +17,20 @@ function App() {
     <div className="flex flex-col h-screen w-full bg-white text-slate-800 overflow-hidden font-sans selection:bg-primary/30">
       <div className="flex flex-1 overflow-hidden relative">
         <Sidebar
-          perspective={perspective}
-          setPerspective={setPerspective}
-          activeFilter={activeFilter}
-          setActiveFilter={setActiveFilter}
+          definitionLevel={definitionLevel}
+          setDefinitionLevel={setDefinitionLevel}
           selectedNode={selectedNode}
           setSelectedNode={setSelectedNode}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           currentView={currentView}
           setCurrentView={setCurrentView}
+          onReset={() => {
+            setDefinitionLevel('summary');
+            setSelectedNode(null);
+            setSearchQuery('');
+            setResetKey(key => key + 1);
+          }}
         />
         <main className="flex-1 relative flex flex-col overflow-hidden">
           {/* Drafting Watermark */}
@@ -39,18 +44,18 @@ function App() {
             {currentView === 'graph' ? (
               <ReactFlowProvider>
                 <GraphViewer
-                  activeFilter={activeFilter}
+                  key={resetKey}
                   onNodeSelect={setSelectedNode}
                   searchQuery={searchQuery}
-                  onFilterChange={setActiveFilter}
                   selectedNode={selectedNode}
                 />
               </ReactFlowProvider>
             ) : (
               <TabularView
-                perspective={perspective}
-                activeFilter={activeFilter}
+                definitionLevel={definitionLevel}
                 searchQuery={searchQuery}
+                selectedNode={selectedNode}
+                onNodeSelect={setSelectedNode}
               />
             )}
           </div>
@@ -60,8 +65,7 @@ function App() {
       {/* Contribute link, copyright and licensing */}
       <footer className="bg-slate-50 border-t border-slate-200 text-slate-400 px-4 py-1.5 text-center text-[11px] z-40 shrink-0 flex flex-wrap items-center justify-center gap-x-1">
         <span className="text-slate-400">
-          Definitions are AI-generated drafts under review and are not
-          authoritative.
+          Review status is shown per concept. This prototype is not authoritative.
         </span>
         <span className="mx-2 text-slate-300">·</span>
         <a

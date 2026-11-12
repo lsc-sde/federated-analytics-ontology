@@ -1,6 +1,12 @@
 {
   "fed_ecosystem": {
     "id": "fed_ecosystem",
+    "shared_definition": {
+      "summary": "A group of Trusted Research Environments (TREs) which follow shared standards and comparable data security, governance and access processes.",
+      "detailed": "A group of Trusted Research Environments (TREs) which follow shared standards and comparable data security, governance and access processes. The purpose is to enable researchers to access and analyse multiple datasets held in different TREs for individual research projects, without having to access each TRE separately.",
+      "example": "For example, a researcher might want to investigate a rare disease for which there is not enough data held in any single TRE. Accessing multiple datasets from a federation of TREs enables the researcher to safely and usefully investigate the rare disease.",
+      "status": "verified"
+    },
     "definitions": {
       "public": "A secure system where multiple organizations agree to let researchers analyze their combined data, without any of the data ever leaving its original, safe location.",
       "tech": "A comprehensive architectural and governance framework integrating decentralized storage, standardized coordination protocols, and distributed computational queries, allowing participating institutions to analyze joint datasets without transferring, co-mingling, or relinquishing sovereignty over the underlying data.",
@@ -118,6 +124,12 @@
   },
   "fed_people": {
     "id": "fed_people",
+    "shared_definition": {
+      "summary": "A federation of people means different people or groups working together under shared rules, while each still keeps their own voice, role, or identity.",
+      "detailed": "A federation of people is a model of human collaboration in which separate people or groups work together through agreed principles, governance, and coordination mechanisms, while remaining distinct rather than fully merging into a single unified body.",
+      "example": "Imagine several community groups joining together to speak with a stronger voice on an issue they all care about. They agree some common rules and goals, but each group still keeps its own identity and chooses how it contributes. That is a federation of people.",
+      "status": "draft"
+    },
     "definitions": {
       "public": "A federation of people means different people or groups working together under shared rules, while each still keeps their own voice, role, or identity.",
       "tech": "A federation of people is a structured collaborative arrangement in which distinct individuals, groups, or communities participate within a shared framework of rules, roles, and coordination, while retaining their own identity, autonomy, and local decision-making authority unless explicitly delegated.",
@@ -204,6 +216,12 @@
   },
   "fed_data": {
     "id": "fed_data",
+    "shared_definition": {
+      "summary": "Federated data refers to multiple different datasets stored in different Trusted Research Environments (TREs) that can be accessed and analysed together as though they were in one place.",
+      "detailed": "Federated data refers to multiple different datasets stored in different Trusted Research Environments (TREs) that can be accessed and analysed together as though they were in one place. Federated data comprises multiple datasets held in separate TREs. These can be analysed together for research without copying the underlying data. Each dataset stays under control of its original organisation, but can still be queried and analysed for a specific research project. This allows independent research to draw on a much wider pool of data, while every organisation keeps ownership and control of their own.",
+      "example": "For example: Weather stations across a country each collect and store their own local readings. Federated data allows a national forecasting system like the MET office to pull data from all stations simultaneously to build a live, country-wide picture, without the stations having to send their raw data to one central archive first.",
+      "status": "verified"
+    },
     "definitions": {
       "public": "Federated data means data is kept in different places, but can still be used together under agreed rules without everyone having to hand it all over to one central place.",
       "tech": "Federated data is a distributed data arrangement in which datasets remain under the stewardship of their original holders, but can be accessed, queried, analysed, or linked in agreed ways across a shared governance and interoperability framework, without routine central pooling of source-level data.",
@@ -319,6 +337,12 @@
   },
   "fed_storage": {
     "id": "fed_storage",
+    "shared_definition": {
+      "summary": "A structured system where files stay exactly where they were born, but a smart computer network knows exactly where everything is so it can all be searched quickly.",
+      "detailed": "A setup where many different hospitals' hard drives are connected through software so you can search them all at once, even though the data is scattered everywhere.",
+      "example": "Connecting secure hard drives from different hospitals into one seamless network directory accessible only by fully permitted researchers.",
+      "status": "draft"
+    },
     "definitions": {
       "public": "A structured system where files stay exactly where they were born, but a smart computer network knows exactly where everything is so it can all be searched quickly.",
       "tech": "A distributed persistent storage paradigm where multiple, heterogeneous, and physically separate storage nodes are virtually orchestrated and queried as a single, coherent logical namespace across different geographic boundaries.",
@@ -417,6 +441,12 @@
   },
   "fed_analytics": {
     "id": "fed_analytics",
+    "shared_definition": {
+      "summary": "A form of analytics that is run across data held in multiple independent Trusted Research Environments (TREs), with each organisation keeping control of their own data.",
+      "detailed": "A form of analytics that is run across data held in multiple independent Trusted Research Environments (TREs), with each organisation keeping control of their own data. Data stays safely within its original TRE. Only the analysis instructions travel, and only anonymous, aggregated results return; the raw data would never leave each TRE, but researchers could still draw insights from the combined statistical findings across all data.",
+      "example": "For example, a dataset studying asthma might include data from several hospitals around the country. Instead of the hospitals sending all that data to one TRE, each hospital would build their own TRE and keep their data within that TRE. In this situation, the researcher writes their computer code and this is then sent to each TRE, analysing only the data kept in that one TRE. The results from all the different TREs are then returned to the researchers and combined.",
+      "status": "verified"
+    },
     "definitions": {
       "public": "A clever system where the math explicitly goes to the data, instead of the data going to the math. The combined answers are then sent back to the researcher safely.",
       "tech": "Non-disclosive federation techniques where statistical algorithms are algorithmically transmitted to, and evaluated concurrently across, disconnected data nodes, returning only deeply aggregated coefficients back to the central orchestrator.",
@@ -487,6 +517,12 @@
   },
   "fed_gov": {
     "id": "fed_gov",
+    "shared_definition": {
+      "summary": "The rules, agreements, and teams of people who formally decide who is allowed to use the data, how they must protect it, and what they can use it for.",
+      "detailed": "The established set of rules, ethics panels, and legal agreements that dictate exactly how, when, and by whom the federated data can be queried.",
+      "example": "A strict rulebook that every hospital and researcher must thoroughly read and sign before they are allowed to join the research network.",
+      "status": "draft"
+    },
     "definitions": {
       "public": "The rules, agreements, and teams of people who formally decide who is allowed to use the data, how they must protect it, and what they can use it for.",
       "tech": "The overarching legal, administrative, and ethical frameworks establishing baseline policies, Data Processing Agreements (DPAs), and liabilities for all consortium operations and cross-institutional workflows.",
@@ -592,6 +628,12 @@
   },
   "fed_infra": {
     "id": "fed_infra",
+    "shared_definition": {
+      "summary": "The highly secure computers, servers, and networks where the data physically lives, and the processing power used to run the math on that data.",
+      "detailed": "The physical servers, secure cloud networks, and processing power provided by an institution so that you can actually store data and run your mathematical models safely.",
+      "example": "A secure, windowless server room at the hospital keeping all patient records completely locked away from the public internet.",
+      "status": "draft"
+    },
     "definitions": {
       "public": "The highly secure computers, servers, and networks where the data physically lives, and the processing power used to run the math on that data.",
       "tech": "The localized hardware architectures and cloud enclaves provisioning both the persistent storage of health data and the ephemeral, isolated compute environments required for secure analysis.",
@@ -691,6 +733,12 @@
   },
   "fed_access": {
     "id": "fed_access",
+    "shared_definition": {
+      "summary": "Federated access means people can be given approved access across different organisations using shared rules, while each organisation still decides what can and cannot be accessed.",
+      "detailed": "Federated access is a way of enabling people to use data or services across multiple organisations through shared access arrangements, without requiring each organisation to give up control of its own systems or permissions.",
+      "example": "Imagine a researcher who is approved to work on a project involving more than one hospital. Federated access means the hospitals can recognise that person's approved identity through shared arrangements, but each hospital still decides exactly what information or systems they are allowed to use.",
+      "status": "draft"
+    },
     "definitions": {
       "public": "Federated access means people can be given approved access across different organisations using shared rules, while each organisation still decides what can and cannot be accessed.",
       "tech": "Federated access is an access model in which independent organisations or systems trust agreed identity, authentication, and authorisation arrangements so that approved users, services, or processes can access resources across organisational boundaries while control over those resources remains with the local owner.",
@@ -1087,6 +1135,12 @@
   },
   "fed_outputs": {
     "id": "fed_outputs",
+    "shared_definition": {
+      "summary": "The final, magical step where the computer perfectly glues all the different pieces of the puzzle together from the different hospitals to clearly reveal the big picture.",
+      "detailed": "The final step where the software automatically catches all the different answers thrown back by the different hospitals and expertly stitches them together into one final, highly accurate master result.",
+      "example": "Taking five completely separate, secure summary reports securely from five different cities and quickly stapling them together to perfectly answer a very hard national medical question.",
+      "status": "draft"
+    },
     "definitions": {
       "public": "The final, magical step where the computer perfectly glues all the different pieces of the puzzle together from the different hospitals to clearly reveal the big picture.",
       "tech": "The orchestrated, complex meta-analytical collation of multiple, disparate node-level statistical outputs into a unified, coherent global estimate strictly within the federated orchestrator framework.",
@@ -1118,6 +1172,12 @@
   },
   "research_outputs": {
     "id": "research_outputs",
+    "shared_definition": {
+      "summary": "The final scientific discoveries, charts, and numbers that researchers are completely allowed to take home and publish to help find cures for diseases.",
+      "detailed": "The final scientific answers, like statistical graphs, average numbers, or trained machine learning models, that you actually take away from the secure environment to publish in your paper.",
+      "example": "Publishing a widely read news article showing that a new cancer treatment works 20% better, without ever revealing any single patient's name to the press.",
+      "status": "draft"
+    },
     "definitions": {
       "public": "The final scientific discoveries, charts, and numbers that researchers are completely allowed to take home and publish to help find cures for diseases.",
       "tech": "The aggregate empirical artifacts (e.g., statistical distributions, trained hyper-parameters, or peer-reviewed manuscripts) synthesized conditionally across the distributed network intended for academic or operational dissemination.",
@@ -1222,6 +1282,12 @@
   },
   "data_protect": {
     "id": "data_protect",
+    "shared_definition": {
+      "summary": "The different ways data can be changed to make it harder to work out who it is about. Some methods swap names for codes, some remove identity altogether, and some invent stand-in data. Each one trades a little usefulness for a little more privacy.",
+      "detailed": "The toolkit used to protect the people in your dataset. Which technique you work with shapes what analysis is possible, so it is worth understanding the differences before you design a study rather than after.",
+      "example": "A hospital preparing records for research has choices. It might replace every name with a reference number, strip out anything that could identify a person, or create an artificial copy of the dataset that behaves like the real one. Which it picks depends on what the research needs and how much risk is acceptable.",
+      "status": "draft"
+    },
     "definitions": {
       "public": "The different ways data can be changed to make it harder to work out who it is about. Some methods swap names for codes, some remove identity altogether, and some invent stand-in data. Each one trades a little usefulness for a little more privacy.",
       "tech": "The family of transformations applied to a dataset to reduce identifiability, spanning reversible substitution of identifiers, irreversible removal of identifying detail, generative substitution, and controls applied to aggregate results before release.",

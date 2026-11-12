@@ -8,9 +8,12 @@ This directory is the **canonical, machine-readable source** of the Federated
 Analytics Ontology vocabulary. The React application in `/src` imports these
 files; it does not hold its own copy.
 
-> **Provenance:** the definition text in `ontology.json` was **AI-generated** as
-> a drafting starting point and has not yet completed stakeholder review. Treat
-> it as a draft under active revision, not as authoritative terminology.
+> **Provenance:** original audience definitions in `ontology.json` were
+> **AI-generated** as a drafting starting point and remain drafts. Shared
+> definitions for Federation, Federated Data and Federated Analytics use
+> project-supplied verified text. Other shared definitions reuse existing draft
+> content pending review. Status applies to the shared content, not the retained
+> legacy audience text or framework mappings.
 
 ## Files
 
@@ -20,21 +23,51 @@ files; it does not hold its own copy.
 | `framework-categories.json` | Which tags belong to which framework (Five Safes, FAIR, PEDRI, SATRE) |
 | `framework-tag-definitions.json` | Plain-English definition of each of the 20 framework tags |
 | `tag-reasons.json` | Why a given framework tag was applied to a given node |
-| `initial-visible-nodes.json` | Node(s) shown when the app first loads |
+| `initial-visible-nodes.json` | Legacy root-node list, retained for data consumers |
+| `atlas-layers.json` | Ordered Why/What membership used by both Atlas views |
 | `schema/ontology.schema.json` | JSON Schema (draft 2020-12) describing `ontology.json` |
 
-## The four-audience model
+## Shared Atlas definitions
 
-Every node defines the same concept four times, because the whole point of the
-project is translation between communities:
+Every node listed in `atlas-layers.json` must have a `shared_definition`:
+
+```json
+{
+  "summary": "An accessible definition.",
+  "detailed": "A more detailed explanation of the same concept.",
+  "example": "A shared example.",
+  "status": "draft"
+}
+```
+
+`status` is `draft` or `verified`. Verified text for the three reviewed concepts
+was transcribed from the project-supplied spreadsheet image: Summary uses L1,
+Detailed uses the cumulative column, and Example uses the example column.
+The L3 column is blank and the separate working notes are not used as definitions.
+Draft content reuses the previous public/researcher definitions and public
+examples; it is not newly verified by being shown under the shared labels.
+
+The Atlas shows one Why concept and all ten existing What concepts. How/Who
+nodes remain in `ontology.json`, including their relationships, but are excluded
+from both views and search. Links to them are not shown as related concepts.
+The graph shows both visible layers immediately rather than progressively
+revealing the removed outer layers.
+
+Contacts currently use an intentionally unresolved `#contact-tbc` link in the
+details panel, not invented personal details or a contact record in the ontology.
+
+## Retained four-audience content
+
+Every node retains its original four audience definitions for compatibility and
+future editorial reference. These fields are not displayed in the Atlas:
 
 - **`public`** — plain English, no jargon
 - **`tech`** — technical and architectural detail
 - **`researcher`** — what it means for doing research
 - **`gov`** — governance, legal and information-governance framing
 
-`examples` follows the same shape, and may additionally carry `sde` and `dare`
-examples used by the tabular view.
+`examples` follows the same legacy shape, and may additionally carry `sde` and
+`dare` examples. The Atlas uses `shared_definition.example` instead.
 
 ## Optional enrichment fields
 
@@ -55,7 +88,7 @@ Two optional fields let a node carry context without adding clutter to the graph
 `resources.json` holds reading that applies to the ontology **as a whole**
 rather than to one concept. Each entry is `{ id, label, url, doi?, publisher?,
 note? }`; `id` is kebab-case and unique, `url` must be absolute. It is rendered
-in the sidebar's collapsible **Find out more** panel, which is visible whether
+in the sidebar's collapsible **Resources** panel, which is visible whether
 or not a node is selected.
 
 Use `resources.json` for framework sources and general background; use a node's
@@ -76,8 +109,10 @@ gap is deliberate and visible rather than forgotten.
 
 Nodes are mapped to four established assurance frameworks: **Five Safes**,
 **FAIR**, **PEDRI** and **SATRE**. Tags assert that a concept is relevant to a
-principle; `tag-reasons.json` records the justification, which is shown in the
-app when a tag is clicked.
+principle; `tag-reasons.json` records the justification. Framework filters, tags,
+the framework ring, Purpose and Essential Characteristics are hidden in both
+Atlas views while their language and alignment are reviewed. The underlying
+fields are retained.
 
 ## Validating changes
 
@@ -89,7 +124,9 @@ npm run validate:data
 
 This checks structure, that every tag is recognised, that `id` matches its key,
 that `children` resolve to real nodes, and that `tag-reasons.json` only
-references nodes that exist.
+references nodes that exist. It also checks Why/What layer membership and the
+shared content required for every visible node. `npm test` checks the retained
+branch list and verified/draft status expectations.
 
 ## Attribution
 

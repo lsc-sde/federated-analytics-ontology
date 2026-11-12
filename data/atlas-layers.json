@@ -1,0 +1,21 @@
+[
+  {
+    "label": "Why",
+    "nodes": ["fed_ecosystem"]
+  },
+  {
+    "label": "What",
+    "nodes": [
+      "fed_people",
+      "fed_access",
+      "fed_data",
+      "fed_storage",
+      "fed_analytics",
+      "fed_outputs",
+      "fed_gov",
+      "fed_infra",
+      "data_protect",
+      "research_outputs"
+    ]
+  }
+]

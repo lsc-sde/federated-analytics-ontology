@@ -8,7 +8,7 @@ Led by **Lancashire Teaching Hospitals NHS Foundation Trust**, in collaboration 
 
 > **On naming:** the **Federated Analytics Ontology** is the work — the vocabulary itself, this repository, and the thing you cite. **Federation Atlas** is the name of the interactive tool used to explore it.
 
-> ⚠️ **Prototype.** This is a working prototype intended to support discussion. Definitions are under active review and should not yet be treated as settled or authoritative.
+> ⚠️ **Prototype.** This is a working prototype intended to support discussion. Federation, Federated Data and Federated Analytics have project-verified shared definitions; remaining definitions are drafts under review. Review status is shown per concept. The tool is not authoritative.
 
 ---
 
@@ -16,34 +16,32 @@ Led by **Lancashire Teaching Hospitals NHS Foundation Trust**, in collaboration 
 
 When multiple Trusted Research Environments (TREs) and Secure Data Environments (SDEs) link up to allow analysis across their data without moving it, the people involved — the public, engineers, researchers, and information governance teams — frequently use the same words to mean different things, or different words to mean the same thing.
 
-This project maps that vocabulary. Every concept is defined **four times, once for each audience**, and mapped against four established assurance frameworks, so that a conversation between a patient representative and a security architect can start from shared ground.
+This project maps that vocabulary so that everyone can start from shared ground. The Atlas focuses on **Why** federation matters and **What** it involves, with the same definitions available to all users.
 
-## The four-audience model
+## Shared definitions
 
-Each of the 29 concepts carries a definition and a worked example for:
+Each visible concept has two definition levels and a shared example:
 
-| Audience | Framing |
+| Level | Framing |
 |---|---|
-| **Public** | Plain English, no jargon |
-| **Technical** | Architecture, protocols, implementation |
-| **Researcher** | What it means for doing research |
-| **Governance** | Legal, ethical and information-governance framing |
+| **Summary** | An accessible starting point, selected by default |
+| **Detailed** | More information about the same concept |
 
-## The four framework lenses
+The verified definitions and examples for Federation, Federated Data and Federated Analytics were supplied by the project. Their Summary text comes from the accessible definition column; Detailed uses the cumulative definition column. The remaining concepts use existing draft content pending editorial review.
 
-Concepts are tagged against four widely used frameworks, and every tag carries a recorded justification shown when you click it:
+## Retained supporting content
 
-- **Five Safes** — Safe People, Projects, Settings, Data, Outputs
-- **FAIR** — Findable, Accessible, Interoperable, Reusable
-- **PEDRI** — public engagement and involvement principles
-- **SATRE** — Standard Architecture for Trusted Research Environments
+How/Who concepts, original audience definitions, purpose text, essential characteristics and mappings to Five Safes, FAIR, PEDRI and SATRE remain in the downloadable ontology. How/Who layers, framework controls and tags, Purpose and Essential Characteristics are not displayed in the Atlas. Framework alignment needs further review before these features return.
 
 ## Using the app
 
-- **Graph view** — explore concepts and how they relate, expanding nodes as you go
-- **Tabular view** — compare all concepts side by side
-- **Audience toggle** — switch any definition between the four framings
-- **Framework filtering** — see which concepts speak to which principles
+- **Graph view** — explore Why and all current What branches and their relationships
+- **Tabular view** — compare the same concepts; select a term to open its details
+- **Summary / Detailed** — change the definition level for both views from the details panel
+- **Search** — find visible concepts by name, either shared definition or related terms; hidden framework tags and archived concepts are not searched
+- **Resources** — browse general reading or resources associated with a selected concept
+- **Contacts** — each selected concept has an intentionally unresolved **Contact TBC** placeholder link until contact details are confirmed
+- **Reset** — clear search and selection, restore Summary and reset the graph layout
 
 ## The ontology as data
 
@@ -63,6 +61,7 @@ npm run dev
 | `npm run dev` | Start the development server |
 | `npm run build` | Type-check and produce a production build |
 | `npm run validate:data` | Validate the ontology in `/data` |
+| `npm test` | Check Atlas scope and shared-definition data |
 | `npm run lint` | Lint the source |
 | `npm run preview` | Preview the production build |
 
@@ -70,11 +69,12 @@ Built with React, TypeScript, Vite, Tailwind CSS and React Flow (`@xyflow/react`
 
 ## How the definitions were produced
 
-> **The definitions in this ontology were AI-generated as a starting point and
-> are drafts under review.** They have not yet been through stakeholder review
-> and should not be treated as authoritative or quoted as settled terminology.
-> They are published openly precisely so that people can correct them — see
-> Contributing below.
+> Original audience definitions were AI-generated as a starting point and
+> remain drafts. Three shared definitions have since been replaced with
+> project-supplied verified text; their status is recorded separately from
+> the retained legacy text. The other shared definitions and examples reuse
+> existing draft content and still need review. Contributions and corrections
+> are welcome — see Contributing below.
 
 ## Contributing
 

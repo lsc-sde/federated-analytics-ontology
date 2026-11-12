@@ -32,6 +32,9 @@ jobs:
       - name: Validate ontology data
         run: npm run validate:data
 
+      - name: Test Atlas scope and shared definitions
+        run: npm test
+
       - name: Lint
         run: npm run lint
 

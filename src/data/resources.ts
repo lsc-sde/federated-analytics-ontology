@@ -1,4 +1,4 @@
-// Project-level further reading, shown in the sidebar's "Find out more" panel.
+// Project-level further reading, shown in the sidebar's "Resources" panel.
 // Canonical source: data/resources.json (CC BY 4.0).
 //
 // Listing is not an endorsement, and linked works may use terms differently

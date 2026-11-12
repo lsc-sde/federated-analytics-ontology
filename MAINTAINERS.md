@@ -156,13 +156,21 @@ npm run validate:data
 
 The validator checks that tags come from the recognised set, each `id` matches
 its key, `children` resolve to real nodes, and tag reasons reference nodes that
-exist. CI runs `validate:data` and `lint` before `build`, so a malformed
+exist. CI runs `validate:data`, Atlas tests and `lint` before `build`, so a malformed
 ontology fails the deploy rather than shipping.
 
-When reviewing a new or changed concept, check that it defines **all four
-audiences** (`public`, `tech`, `researcher`, `gov`) for both `definitions` and
-`examples`, and that any framework tag has a matching justification in
-`tag-reasons.json`. Unexplained tags are hard for others to trust or challenge.
+When reviewing a new or changed concept, retain **all four legacy audiences**
+(`public`, `tech`, `researcher`, `gov`) for both `definitions` and `examples`.
+Every visible Why/What node in `data/atlas-layers.json` also needs
+`shared_definition` with Summary, Detailed, Example and a `draft` or `verified`
+status. Only mark content verified after project review. `npm test` checks
+the current visible scope and shared-content expectations.
+
+How/Who concepts, Purpose, Essential Characteristics and framework mappings
+remain in the ontology but are hidden in the Atlas. If a framework tag changes,
+keep its justification in `tag-reasons.json` up to date. General resources live
+in `data/resources.json`; concept resources use `additional_resources`.
+Contacts are intentionally unresolved **Contact TBC** links until confirmed.
 
 ---
 

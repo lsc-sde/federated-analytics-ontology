@@ -22,6 +22,7 @@ const tagReasons = read('tag-reasons.json');
 const initial = read('initial-visible-nodes.json');
 const schema = read('schema/ontology.schema.json');
 const resources = read('resources.json');
+const atlasLayers = read('atlas-layers.json');
 
 const validTags = new Set(schema.$defs.frameworkTag.enum);
 const validTypes = new Set(schema.$defs.ontologyNode.properties.type.enum);
@@ -36,6 +37,26 @@ for (const [key, node] of Object.entries(ontology)) {
     if (node.id !== key) err(key, `"id" is "${node.id}" but the key is "${key}"`);
     if (!node.label) err(key, 'missing "label"');
     if (!validTypes.has(node.type)) err(key, `invalid type "${node.type}"`);
+    if (node.shared_definition !== undefined) {
+        const shared = node.shared_definition;
+        if (!shared || typeof shared !== 'object' || Array.isArray(shared)) {
+            err(key, 'shared_definition must be an object');
+        } else {
+            for (const field of ['summary', 'detailed', 'example']) {
+                if (typeof shared[field] !== 'string' || !shared[field].trim()) {
+                    err(key, `shared_definition.${field} must be non-empty text`);
+                }
+            }
+            if (!['draft', 'verified'].includes(shared.status)) {
+                err(key, 'shared_definition.status must be draft or verified');
+            }
+            for (const field of Object.keys(shared)) {
+                if (!['summary', 'detailed', 'example', 'status'].includes(field)) {
+                    err(key, `unknown shared_definition field "${field}"`);
+                }
+            }
+        }
+    }
 
     for (const field of ['definitions', 'examples']) {
         if (!node[field]) { err(key, `missing "${field}"`); continue; }
@@ -75,6 +96,23 @@ for (const [key, node] of Object.entries(ontology)) {
 }
 
 // Cross-file integrity
+const atlasIds = new Set();
+if (!Array.isArray(atlasLayers) || atlasLayers.length !== 2) {
+    errors.push('atlas-layers.json: must contain exactly Why and What layers');
+} else {
+    for (const [index, layer] of atlasLayers.entries()) {
+        if (layer?.label !== ['Why', 'What'][index] || !Array.isArray(layer?.nodes) || !layer.nodes.length) {
+            errors.push('atlas-layers.json: each layer needs its expected label and non-empty nodes');
+            continue;
+        }
+        for (const id of layer.nodes) {
+            if (!ids.has(id)) errors.push(`atlas-layers.json: unknown node "${id}"`);
+            if (atlasIds.has(id)) errors.push(`atlas-layers.json: duplicate node "${id}"`);
+            if (!ontology[id]?.shared_definition) errors.push(`atlas-layers.json: "${id}" needs shared_definition`);
+            atlasIds.add(id);
+        }
+    }
+}
 for (const tag of Object.values(categories).flat()) {
     if (!validTags.has(tag)) errors.push(`framework-categories.json: unknown tag "${tag}"`);
 }

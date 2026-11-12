@@ -1,461 +1,203 @@
-import { useState, useRef, useEffect } from 'react';
-import { OntologyNode, FrameworkTag, frameworkCategories } from '../data/ontology';
-import { tagReasons } from '../data/tagReasons';
-import { frameworkTagDefinitions } from '../data/frameworkTagDefinitions';
+import { useRef, useEffect } from 'react';
+import { DefinitionLevel } from '../data/ontology';
+import { AtlasNode, visibleChildren } from '../data/atlas';
 import { resources } from '../data/resources';
-import { SlidersHorizontal, Settings, BookOpen, Fingerprint, ChevronDown, ChevronRight, Search, X, ExternalLink } from 'lucide-react';
+import { BookOpen, Fingerprint, Search, X, ExternalLink } from 'lucide-react';
 
 interface SidebarProps {
-    perspective: 'public' | 'tech' | 'researcher' | 'gov';
-    setPerspective: (m: 'public' | 'tech' | 'researcher' | 'gov') => void;
-    activeFilter: FrameworkTag | null;
-    setActiveFilter: (f: FrameworkTag | null) => void;
-    selectedNode: OntologyNode | null;
-    setSelectedNode: (n: OntologyNode | null) => void;
+    definitionLevel: DefinitionLevel;
+    setDefinitionLevel: (level: DefinitionLevel) => void;
+    selectedNode: AtlasNode | null;
+    setSelectedNode: (node: AtlasNode | null) => void;
     searchQuery: string;
-    setSearchQuery: (q: string) => void;
+    setSearchQuery: (query: string) => void;
     currentView: 'graph' | 'table';
-    setCurrentView: (v: 'graph' | 'table') => void;
+    setCurrentView: (view: 'graph' | 'table') => void;
+    onReset: () => void;
 }
 
-const frameworkColors: Record<string, { bg: string; border: string; text: string }> = {
-    'Six Safes': { bg: 'bg-amber-100', border: 'border-amber-400', text: 'text-amber-800' },
-    'FAIR': { bg: 'bg-sky-100', border: 'border-sky-400', text: 'text-sky-800' },
-    'PEDRI': { bg: 'bg-rose-100', border: 'border-rose-400', text: 'text-rose-800' },
-    'SATRE': { bg: 'bg-violet-100', border: 'border-violet-400', text: 'text-violet-800' },
-};
-
-function getFrameworkForTag(tag: FrameworkTag): string | null {
-    for (const [framework, tags] of Object.entries(frameworkCategories)) {
-        if ((tags as string[]).includes(tag)) return framework;
-    }
-    return null;
-}
-
-export default function Sidebar({ perspective, setPerspective, activeFilter, setActiveFilter, selectedNode, setSelectedNode, searchQuery, setSearchQuery, currentView, setCurrentView }: SidebarProps) {
-    const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
-    const [expandedTag, setExpandedTag] = useState<string | null>(null);
-    const [filtersOpen, setFiltersOpen] = useState(true);
-    const [resourcesOpen, setResourcesOpen] = useState(false);
+export default function Sidebar({
+    definitionLevel, setDefinitionLevel, selectedNode, setSelectedNode,
+    searchQuery, setSearchQuery, currentView, setCurrentView, onReset,
+}: SidebarProps) {
     const detailsRef = useRef<HTMLDivElement>(null);
 
-    // When a node is selected, collapse the filters and bring the details panel
-    // into view. Without this the panel sits below the fold and the user has to
-    // scroll to find the content they just asked for.
     useEffect(() => {
-        if (!selectedNode) return;
-        setFiltersOpen(false);
-        // Wait for the collapse to paint before scrolling, otherwise we scroll
-        // to the pre-collapse position.
-        const frame = requestAnimationFrame(() => {
+        if (selectedNode) {
             detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-        return () => cancelAnimationFrame(frame);
+        }
     }, [selectedNode]);
 
-    const toggleCategory = (category: string) => {
-        setOpenCategories(prev => ({ ...prev, [category]: !prev[category] }));
-    };
-
-    const reasons = selectedNode ? tagReasons[selectedNode.id] || {} : {};
+    const relatedNodes = selectedNode ? visibleChildren(selectedNode) : [];
 
     return (
-        <div className="w-[480px] h-full bg-slate-50 border-r border-slate-200 flex flex-col shadow-lg z-10 p-6 overflow-y-auto">
-
-            <div className="mb-6 flex items-start justify-between">
+        <aside aria-label="Explore the ontology" className="w-[440px] shrink-0 h-full bg-slate-50 border-r border-slate-200 flex flex-col shadow-lg z-10 p-6 overflow-y-auto">
+            <div className="mb-6 flex items-start justify-between gap-3">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-700 to-teal-600 bg-clip-text text-transparent mb-2 flex items-center gap-3">
-                        <Fingerprint className="w-8 h-8 text-blue-600" />
+                    <h1 className="text-3xl font-bold text-blue-700 mb-2 flex items-center gap-2">
+                        <Fingerprint className="w-8 h-8 shrink-0" />
                         Federation Atlas
                     </h1>
-                    <p className="text-sm text-slate-500">An interactive view of the Federated Analytics Ontology</p>
+                    <p className="text-sm text-slate-500">Why federation matters and what it involves.</p>
                 </div>
-                <button
-                    onClick={() => {
-                        setActiveFilter(null);
-                        setSearchQuery('');
-                        setSelectedNode(null);
-                    }}
-                    className="px-4 py-1.5 text-sm font-medium rounded-lg border bg-white border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-800 shadow-sm transition-all"
-                >
+                <button onClick={onReset} className="px-3 py-1.5 text-sm rounded-lg border bg-white border-slate-300 text-slate-600">
                     Reset
                 </button>
             </div>
 
-            {/* Search Bar */}
             <div className="mb-6 relative">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        placeholder="Search nodes, tags, definitions..."
-                        className="w-full pl-10 pr-9 py-2.5 text-sm bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all placeholder:text-slate-400"
-                    />
-                    {searchQuery && (
-                        <button
-                            onClick={() => setSearchQuery('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            {/* View Toggle */}
-            <div className="mb-6 p-1 bg-slate-100 rounded-lg flex relative">
-                <div
-                    className={`absolute inset-y-1 w-[calc(50%-4px)] bg-white border border-slate-200 shadow-sm rounded-md transition-all duration-300 pointer-events-none ${currentView === 'table' ? 'left-[calc(50%+2px)]' : 'left-1'}`}
+                <label htmlFor="concept-search" className="sr-only">Search concepts and definitions</label>
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                    id="concept-search"
+                    type="search"
+                    value={searchQuery}
+                    onChange={event => setSearchQuery(event.target.value)}
+                    placeholder="Search concepts and definitions..."
+                    className="w-full pl-10 pr-9 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
-                <button
-                    onClick={() => setCurrentView('graph')}
-                    className={`flex-1 py-1.5 text-sm font-medium z-10 transition-colors ${currentView === 'graph' ? 'text-slate-800' : 'text-slate-400 hover:text-slate-600'}`}
-                >
-                    Graph View
-                </button>
-                <button
-                    onClick={() => setCurrentView('table')}
-                    className={`flex-1 py-1.5 text-sm font-medium z-10 transition-colors ${currentView === 'table' ? 'text-slate-800' : 'text-slate-400 hover:text-slate-600'}`}
-                >
-                    Tabular View
-                </button>
+                {searchQuery && (
+                    <button onClick={() => setSearchQuery('')} aria-label="Clear search" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
+                        <X className="w-4 h-4" />
+                    </button>
+                )}
             </div>
 
-            {/* Definition Perspective */}
-            <div className="mb-8 p-5 bg-white rounded-xl border border-slate-200 shadow-sm">
-                <h3 className="text-base font-semibold flex items-center gap-2 text-slate-700 mb-4">
-                    <SlidersHorizontal className="w-5 h-5" />
-                    Definition Perspective
-                </h3>
-                <div className="flex bg-slate-100 rounded-lg p-1 relative">
-                    <div
-                        className={`absolute inset-y-1 w-[calc(25%-2px)] bg-blue-100 border border-blue-300 shadow-sm rounded-md transition-all duration-300 pointer-events-none ${perspective === 'public' ? 'left-1' :
-                            perspective === 'tech' ? 'left-[calc(25%+1px)]' :
-                                perspective === 'researcher' ? 'left-[calc(50%+1px)]' : 'left-[calc(75%+1px)]'
-                            }`}
-                    />
+            <div className="mb-6 p-1 bg-slate-100 rounded-lg flex gap-1" role="group" aria-label="View">
+                {(['graph', 'table'] as const).map(view => (
                     <button
-                        onClick={() => setPerspective('public')}
-                        className={`flex-1 py-2 px-1 z-10 transition-colors ${perspective === 'public' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}
+                        key={view}
+                        onClick={() => setCurrentView(view)}
+                        aria-pressed={currentView === view}
+                        className={`flex-1 py-2 text-sm rounded-md ${currentView === view ? 'bg-white shadow-sm text-blue-700' : 'text-slate-600'}`}
                     >
-                        <span className="block text-sm font-medium">Public</span>
-                        <span className="block text-[10px] leading-tight opacity-70">Why it matters</span>
+                        {view === 'graph' ? 'Graph View' : 'Tabular View'}
                     </button>
-                    <button
-                        onClick={() => setPerspective('tech')}
-                        className={`flex-1 py-2 px-1 z-10 transition-colors ${perspective === 'tech' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}
-                    >
-                        <span className="block text-sm font-medium">Technical</span>
-                        <span className="block text-[10px] leading-tight opacity-70">How it works</span>
-                    </button>
-                    <button
-                        onClick={() => setPerspective('researcher')}
-                        className={`flex-1 py-2 px-1 z-10 transition-colors ${perspective === 'researcher' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}
-                    >
-                        <span className="block text-sm font-medium">Researcher</span>
-                        <span className="block text-[10px] leading-tight opacity-70">What I can do</span>
-                    </button>
-                    <button
-                        onClick={() => setPerspective('gov')}
-                        className={`flex-1 py-2 px-1 z-10 transition-colors ${perspective === 'gov' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}
-                    >
-                        <span className="block text-sm font-medium">Governance</span>
-                        <span className="block text-[10px] leading-tight opacity-70">Who&apos;s accountable</span>
-                    </button>
-                </div>
+                ))}
             </div>
 
-            {/* Framework Filters */}
-            <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                    <button
-                        onClick={() => setFiltersOpen(o => !o)}
-                        className="flex items-center gap-2 text-base font-semibold text-slate-700 hover:text-slate-900 transition-colors"
-                        aria-expanded={filtersOpen}
-                    >
-                        <Settings className="w-5 h-5" />
-                        Framework Filters
-                        {filtersOpen ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
-                        {!filtersOpen && activeFilter && (
-                            <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-blue-50 border border-blue-300 text-blue-700">
-                                1 active
-                            </span>
-                        )}
-                    </button>
-                    <button
-                        onClick={() => setActiveFilter(null)}
-                        className={`px-3 py-1 text-xs rounded-full border transition-all ${activeFilter === null
-                            ? 'bg-blue-50 border-blue-400 text-blue-600 shadow-sm'
-                            : 'bg-transparent border-slate-300 text-slate-400 hover:border-slate-400 hover:text-slate-600'
-                            }`}
-                    >
-                        Clear Filter
-                    </button>
-                </div>
-                {filtersOpen && (
-                <div className="flex flex-col gap-2">
-                    {Object.entries(frameworkCategories).map(([categoryName, tags]) => (
-                        <div key={categoryName} className="border border-slate-200 rounded-lg shadow-sm">
-                            <button
-                                onClick={() => toggleCategory(categoryName)}
-                                className={`w-full flex items-center justify-between p-3 bg-white hover:bg-slate-50 transition-colors text-slate-700 font-medium text-sm ${openCategories[categoryName] ? 'rounded-t-lg' : 'rounded-lg'}`}
-                            >
-                                {categoryName}
-                                {openCategories[categoryName] ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
-                            </button>
-                            {openCategories[categoryName] && (
-                                <div className="p-3 bg-slate-50 flex flex-wrap gap-2 border-t border-slate-200 rounded-b-lg">
-                                    {tags.map((tag) => (
-                                        <div key={tag} className="relative group">
-                                            <button
-                                                onClick={() => setActiveFilter(tag as FrameworkTag)}
-                                                className={`w-full px-3 py-1.5 text-sm rounded-full border transition-all ${activeFilter === tag
-                                                    ? 'bg-blue-50 border-blue-400 text-blue-700 shadow-sm'
-                                                    : 'bg-white border-slate-300 text-slate-500 hover:border-slate-400 hover:text-slate-700'
-                                                    }`}
-                                            >
-                                                {tag.replace(/^(PEDRI:\s|SATRE:\s)/, '')}
-                                            </button>
-
-                                            {/* Tooltip */}
-                                            <div className="absolute left-1/2 -translate-x-1/2 bottom-[calc(100%+6px)] w-56 p-2.5 bg-slate-800 text-slate-100 text-xs font-medium rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none text-center leading-relaxed">
-                                                {frameworkTagDefinitions[tag as FrameworkTag]}
-                                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-slate-800"></div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+            <section ref={detailsRef} aria-labelledby="details-heading" className="mb-6">
+                <h2 id="details-heading" className="text-base font-semibold flex items-center gap-2 text-slate-700 mb-4">
+                    <BookOpen className="w-5 h-5" /> Details
+                </h2>
+                <div className="flex gap-1 bg-slate-100 rounded-lg p-1 mb-4" role="group" aria-label="Definition level">
+                    {(['summary', 'detailed'] as const).map(level => (
+                        <button
+                            key={level}
+                            onClick={() => setDefinitionLevel(level)}
+                            aria-pressed={definitionLevel === level}
+                            className={`flex-1 py-2 rounded-md text-sm font-medium ${definitionLevel === level ? 'bg-blue-100 text-blue-800 shadow-sm' : 'text-slate-600'}`}
+                        >
+                            {level === 'summary' ? 'Summary' : 'Detailed'}
+                        </button>
                     ))}
                 </div>
-                )}
-            </div>
 
-            {/* Details Panel */}
-            <div ref={detailsRef} className="flex-1 border-t border-slate-200 pt-6 pb-4 scroll-mt-4">
-                <h3 className="text-base font-semibold flex items-center gap-2 text-slate-700 mb-6">
-                    <BookOpen className="w-5 h-5" />
-                    Details Panel
-                </h3>
                 {selectedNode ? (
-                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 flex flex-col gap-4">
+                    <div className="flex flex-col gap-5">
                         <div>
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className={`w-3 h-3 rounded-full shadow-sm ${selectedNode.type === 'definition' ? 'bg-emerald-500' : selectedNode.type === 'provider' ? 'bg-orange-500' : 'bg-purple-500'}`} />
-                                <h4 className="text-xl font-bold text-slate-800">{selectedNode.label}</h4>
-                            </div>
-                            <p className="text-sm uppercase tracking-wider text-slate-400 font-bold mb-4">
-                                {selectedNode.type}
+                            <h3 className="text-xl font-bold text-slate-800 mb-2">{selectedNode.label}</h3>
+                            <p className="text-xs text-slate-500 mb-3">
+                                {selectedNode.shared_definition.status === 'verified'
+                                    ? 'Verified definition supplied by the project.'
+                                    : 'Draft definition - awaiting review.'}
                             </p>
-                            {selectedNode.purpose && (
-                                <div className="mb-4 bg-emerald-50/50 p-4 rounded-xl border-l-4 border-l-emerald-500 border-y border-r border-slate-200 shadow-sm">
-                                    <h5 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Purpose</h5>
-                                    <p className="text-sm font-medium text-slate-700">{selectedNode.purpose}</p>
-                                </div>
-                            )}
-
-                            <div className="bg-white p-5 rounded-xl border border-slate-200 leading-relaxed text-base text-slate-700 shadow-sm">
-                                {selectedNode.definitions[perspective] || <span className="text-slate-400 italic">No definition available for this perspective.</span>}
-                                {selectedNode.related_terms && selectedNode.related_terms.length > 0 && (
-                                    <div className="mt-4 pt-4 border-t border-slate-100">
-                                        <h5 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Related Terms</h5>
-                                        <ul className="space-y-2">
-                                            {selectedNode.related_terms.map(rt => (
-                                                <li key={rt.term} className="text-sm">
-                                                    <span className="font-semibold text-slate-700">{rt.term}</span> = <span className="text-slate-600">{rt.definition}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
+                            <p className="bg-white p-5 rounded-xl border border-slate-200 leading-relaxed text-slate-700">
+                                {selectedNode.shared_definition[definitionLevel]}
+                            </p>
                         </div>
-
-                        {selectedNode.examples[perspective] && (
-                            <div className="mt-2">
-                                <h5 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Example</h5>
-                                <div className="bg-blue-50/50 p-5 rounded-xl border-l-4 border-l-blue-500 border-y border-r border-slate-200 leading-relaxed text-base text-slate-600 italic shadow-sm">
-                                    "{selectedNode.examples[perspective]}"
-                                </div>
+                        <div>
+                            <h4 className="font-semibold text-slate-600 mb-2">Example</h4>
+                            <p className="bg-blue-50 p-4 rounded-xl text-sm leading-relaxed text-slate-700">
+                                {selectedNode.shared_definition.example}
+                            </p>
+                        </div>
+                        {!!selectedNode.related_terms?.length && (
+                            <div>
+                                <h4 className="font-semibold text-slate-600 mb-2">Related terms</h4>
+                                <dl className="text-sm space-y-2">
+                                    {selectedNode.related_terms.map(term => (
+                                        <div key={term.term}>
+                                            <dt className="font-semibold">{term.term}</dt>
+                                            <dd>{term.definition}</dd>
+                                        </div>
+                                    ))}
+                                </dl>
                             </div>
                         )}
-
-                        {/* Essential Characteristics */}
-                        {selectedNode.essential_characteristics && selectedNode.essential_characteristics.length > 0 && (
-                            <div className="mt-2 text-sm">
-                                <h5 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Essential Characteristics</h5>
-                                <div className="bg-emerald-50/50 p-4 rounded-xl border-l-4 border-l-emerald-500 border-y border-r border-slate-200 leading-relaxed text-slate-700 shadow-sm">
-                                    <p className="text-xs text-slate-500 mb-3 italic">
-                                        Note: These should broadly align to framework developments such as SATRE 2.0 and represent that which is measurable or observable to determine if a criteria is met or not met.
-                                    </p>
-                                    <ul className="list-disc list-outside ml-4 space-y-3">
-                                        {selectedNode.essential_characteristics.map((char, i) => {
-                                            const match = char.description.match(/^([^:;]+[:;])(.*)$/);
-                                            return (
-                                                <li key={i}>
-                                                    <span className="block mb-1">
-                                                        {match ? (
-                                                            <>
-                                                                <span className="font-bold">{match[1]}</span>
-                                                                {match[2]}
-                                                            </>
-                                                        ) : (
-                                                            char.description
-                                                        )}
-                                                    </span>
-                                                    {char.tags && char.tags.length > 0 && (
-                                                        <div className="flex flex-wrap gap-1 mt-1">
-                                                            {char.tags.map(t => {
-                                                                const framework = getFrameworkForTag(t);
-                                                                const colors = framework ? frameworkColors[framework] : null;
-                                                                return (
-                                                                    <span key={t} className={`px-1.5 py-0.5 text-[10px] rounded border ${colors ? `${colors.bg} ${colors.border} ${colors.text}` : 'bg-slate-100 text-slate-600 border-slate-300'}`}>
-                                                                        {t.replace(/^(PEDRI:\s|SATRE:\s)/, '')}
-                                                                    </span>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    )}
-                                                </li>
-                                            );
-                                        })}
-                                    </ul>
-                                </div>
+                        {relatedNodes.length > 0 && (
+                            <div>
+                                <h4 className="font-semibold text-slate-600 mb-2">Related concepts</h4>
+                                <ul className="space-y-2 text-sm">
+                                    {relatedNodes.map(node => (
+                                        <li key={node.id}>
+                                            <button onClick={() => setSelectedNode(node)} className="text-blue-700 hover:underline text-left">
+                                                {node.label}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                         )}
-
-                        {/* Clickable Framework Tags */}
-                        {selectedNode.tags && selectedNode.tags.length > 0 && (
-                            <div className="mt-2">
-                                <h5 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Framework Tags</h5>
-                                <div className="flex flex-col gap-2">
-                                    {selectedNode.tags.map(tag => {
-                                        const framework = getFrameworkForTag(tag);
-                                        const colors = framework ? frameworkColors[framework] : null;
-                                        const reason = reasons[tag as keyof typeof reasons];
-                                        const isExpanded = expandedTag === tag;
-                                        return (
-                                            <div key={tag}>
-                                                <button
-                                                    onClick={() => setExpandedTag(isExpanded ? null : tag)}
-                                                    className={`w-full text-left px-3 py-2 text-sm rounded-lg border transition-all flex items-center justify-between gap-2 ${colors
-                                                        ? `${colors.bg} ${colors.border} ${colors.text} hover:opacity-80`
-                                                        : 'bg-slate-100 border-slate-300 text-slate-600'
-                                                        } ${isExpanded ? 'ring-2 ring-blue-300' : ''}`}
-                                                >
-                                                    <span className="font-semibold">{tag}</span>
-                                                    {reason && (
-                                                        <ChevronDown className={`w-3.5 h-3.5 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`} />
-                                                    )}
-                                                </button>
-                                                {isExpanded && reason && (
-                                                    <div className="mt-1 ml-2 px-3 py-2 text-sm text-slate-600 bg-white border border-slate-200 rounded-lg shadow-sm animate-in fade-in slide-in-from-top-1 duration-200">
-                                                        {reason}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                        {!!selectedNode.additional_resources?.length && (
+                            <div>
+                                <h4 className="font-semibold text-slate-600 mb-2">Resources for this concept</h4>
+                                <ul className="space-y-3 text-sm">
+                                    {selectedNode.additional_resources.map(resource => (
+                                        <li key={resource.url}>
+                                            <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">
+                                                {resource.label} <ExternalLink className="inline w-3 h-3" />
+                                            </a>
+                                            {resource.note && <p className="text-slate-600 mt-1">{resource.note}</p>}
+                                            {resource.doi && <p className="text-xs text-slate-500 mt-1">DOI: {resource.doi}</p>}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                         )}
-
-                        {/* Additional resources */}
-                        {selectedNode.additional_resources && selectedNode.additional_resources.length > 0 && (
-                            <div className="mt-2">
-                                <h5 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Additional resources</h5>
-                                <div className="bg-amber-50/50 p-4 rounded-xl border-l-4 border-l-amber-500 border-y border-r border-slate-200 shadow-sm">
-                                    <p className="text-xs text-slate-500 mb-3 italic">
-                                        Further reading and source material. Listed for context — being linked here is not an endorsement, and these works may use terms differently.
-                                    </p>
-                                    <ul className="space-y-3">
-                                        {selectedNode.additional_resources.map((ref, i) => (
-                                            <li key={i} className="text-sm">
-                                                <a
-                                                    href={ref.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="font-semibold text-blue-700 hover:text-blue-900 hover:underline inline-flex items-start gap-1"
-                                                >
-                                                    <span>{ref.label}</span>
-                                                    <ExternalLink className="w-3 h-3 mt-1 flex-shrink-0" />
-                                                </a>
-                                                {ref.note && (
-                                                    <p className="text-slate-600 mt-1">{ref.note}</p>
-                                                )}
-                                                {ref.doi && (
-                                                    <p className="text-xs text-slate-400 mt-1">DOI: {ref.doi}</p>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        )}
+                        <div>
+                            <h4 className="font-semibold text-slate-600 mb-2">Contacts</h4>
+                            <a href="#contact-tbc" className="text-sm text-blue-700 underline" aria-describedby="contact-placeholder-note">
+                                Contact TBC
+                            </a>
+                            <p id="contact-placeholder-note" className="text-xs text-slate-500 mt-1">
+                                Placeholder link - contact details have not yet been confirmed.
+                            </p>
+                        </div>
                     </div>
                 ) : (
-                    <div className="text-center p-8 border-2 border-dashed border-slate-200 rounded-xl bg-white">
-                        <p className="text-base text-slate-400 italic">Click or hover over a node on the map to view its detailed definition.</p>
-                    </div>
+                    <p className="p-6 border-2 border-dashed border-slate-200 rounded-xl text-sm text-slate-500">
+                        Select a concept in the graph or table to read its definition, resources and contacts.
+                    </p>
                 )}
-            </div>
+            </section>
 
-            {/* Find out more — project-level reading, always available regardless of selection */}
             {resources.length > 0 && (
-                <div className="px-4 pb-4">
-                    <button
-                        onClick={() => setResourcesOpen(!resourcesOpen)}
-                        className="w-full flex items-center justify-between gap-2 text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2 hover:text-slate-700 transition-colors"
-                        aria-expanded={resourcesOpen}
-                    >
-                        <span>Find out more</span>
-                        <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ${resourcesOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    {resourcesOpen && (
-                        <div className="bg-amber-50/50 p-4 rounded-xl border-l-4 border-l-amber-500 border-y border-r border-slate-200 shadow-sm animate-in fade-in slide-in-from-top-1 duration-200">
-                            <p className="text-xs text-slate-500 mb-3 italic">
-                                Listed for context — being linked here is not an endorsement, and these works may use terms differently.
-                            </p>
-                            <ul className="space-y-3">
-                                {resources.map((res) => (
-                                    <li key={res.id} className="text-sm">
-                                        <a
-                                            href={res.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="font-semibold text-blue-700 hover:text-blue-900 hover:underline inline-flex items-start gap-1"
-                                        >
-                                            <span>{res.label}</span>
-                                            <ExternalLink className="w-3 h-3 mt-1 flex-shrink-0" />
-                                        </a>
-                                        {res.publisher && (
-                                            <p className="text-xs text-slate-500 mt-1">{res.publisher}</p>
-                                        )}
-                                        {res.note && (
-                                            <p className="text-slate-600 mt-1">{res.note}</p>
-                                        )}
-                                        {res.doi && (
-                                            <p className="text-xs text-slate-400 mt-1">DOI: {res.doi}</p>
-                                        )}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                </div>
+                <details className="mb-6 border-t border-slate-200 pt-4">
+                    <summary className="cursor-pointer font-semibold text-slate-700">Resources</summary>
+                    <p className="text-xs text-slate-500 my-3">
+                        General reading. Listing is not an endorsement, and linked works may use terms differently.
+                    </p>
+                    <ul className="space-y-4 text-sm">
+                        {resources.map(resource => (
+                            <li key={resource.id}>
+                                <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">
+                                    {resource.label} <ExternalLink className="inline w-3 h-3" />
+                                </a>
+                                {resource.publisher && <p className="text-xs text-slate-500 mt-1">{resource.publisher}</p>}
+                                {resource.note && <p className="text-slate-600 mt-1">{resource.note}</p>}
+                                {resource.doi && <p className="text-xs text-slate-500 mt-1">DOI: {resource.doi}</p>}
+                            </li>
+                        ))}
+                    </ul>
+                </details>
             )}
-
-            {/* Partner Logos */}
-            <div className="logo-bar">
+            <div className="logo-bar mt-auto">
                 <img src="/logo-one-lsc.png" alt="One LSC - Data into Impact" />
                 <img src="/logo-datashield.png" alt="DataSHIELD - Secure Bioscience Collaboration" />
                 <img src="/logo-focus5.png" alt="FOCUS-5" />
                 <img src="/logo-dare-uk.png" alt="DARE UK" />
             </div>
-
-        </div>
+        </aside>
     );
 }
